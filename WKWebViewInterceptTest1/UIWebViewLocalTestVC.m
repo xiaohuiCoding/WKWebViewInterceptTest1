@@ -1,66 +1,35 @@
 //
-//  LocalTestVC.m
+//  UIWebViewLocalTestVC.m
 //  WKWebViewInterceptTest1
 //
 //  Created by xiaohui on 2018/3/14.
 //  Copyright © 2018年 XIAOHUI. All rights reserved.
 //
 
-#import "LocalTestVC.h"
-#import <WebKit/WebKit.h>
+#import "UIWebViewLocalTestVC.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface LocalTestVC () <WKNavigationDelegate,WKUIDelegate>
+@interface UIWebViewLocalTestVC () <UIWebViewDelegate>
 
-@property (nonatomic, strong) WKWebView *webView;
-@property (nonatomic, strong) UIProgressView *progressView;
+@property (strong, nonatomic) UIWebView *webView;
 
 @end
 
-@implementation LocalTestVC
-
-- (void)dealloc {
-    NSLog(@"%s",__FUNCTION__);
-    [self.webView removeObserver:self forKeyPath:@"estimatedProgress"];
-}
+@implementation UIWebViewLocalTestVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    [self initWKWebView];
-    [self initProgressView];
-    
-    [self.webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
-}
-
-- (void)initWKWebView {
-    WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
-    configuration.userContentController = [WKUserContentController new];
-    
-    WKPreferences *preferences = [WKPreferences new];
-    preferences.javaScriptCanOpenWindowsAutomatically = YES;
-    preferences.minimumFontSize = 30.0;
-    configuration.preferences = preferences;
-    
-    self.webView = [[WKWebView alloc] initWithFrame:self.view.frame configuration:configuration];
-    
-    NSString *urlStr = [[NSBundle mainBundle] pathForResource:@"index.html" ofType:nil];
-    NSURL *fileURL = [NSURL fileURLWithPath:urlStr];
-    [self.webView loadFileURL:fileURL allowingReadAccessToURL:fileURL];
-    
-    self.webView.navigationDelegate = self;
-    self.webView.UIDelegate = self;
+    self.webView = [[UIWebView alloc] initWithFrame:self.view.frame];
+    self.webView.delegate = self;
+    NSURL *htmlURL = [[NSBundle mainBundle] URLForResource:@"index.html" withExtension:nil];
+    //    NSURL *htmlURL = [NSURL URLWithString:@"http://www.baidu.com"];
+    NSURLRequest *request = [NSURLRequest requestWithURL:htmlURL];
+    // UIWebView 滚动的比较慢，这里设置为正常速度
+    self.webView.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
+    [self.webView loadRequest:request];
     [self.view addSubview:self.webView];
-}
-
-- (void)initProgressView {
-    CGFloat kScreenWidth = [[UIScreen mainScreen] bounds].size.width;
-    UIProgressView *progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 2)];
-    progressView.tintColor = [UIColor redColor];
-    progressView.trackTintColor = [UIColor lightGrayColor];
-    [self.view addSubview:progressView];
-    self.progressView = progressView;
 }
 
 #pragma mark - private method
@@ -87,9 +56,7 @@
 - (void)getLocation {
     // 将获取到的位置信息返回给js
     NSString *jsStr = [NSString stringWithFormat:@"setLocation('%@')",@"您当前的位置是浙江省杭州市"];
-    [self.webView evaluateJavaScript:jsStr completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        NSLog(@"location:%@----%@",result, error);
-    }];
+    [self.webView stringByEvaluatingJavaScriptFromString:jsStr];
 }
 
 - (void)share:(NSURL *)URL {
@@ -107,9 +74,7 @@
     NSString *url = [tempDic objectForKey:@"url"];
     // 将要分享的信息返回给js
     NSString *jsStr = [NSString stringWithFormat:@"shareResult('%@','%@','%@')",title,content,url];
-    [self.webView evaluateJavaScript:jsStr completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        NSLog(@"share:%@----%@",result, error);
-    }];
+    [self.webView stringByEvaluatingJavaScriptFromString:jsStr];
 }
 
 - (void)changeBGColor:(NSURL *)URL {
@@ -152,9 +117,7 @@
     NSString *channel = [tempDic objectForKey:@"channel"];
     // 将支付结果返回给js
     NSString *jsStr = [NSString stringWithFormat:@"payResult('%@', '%lld', '%@', '%@')", orderNo,amount,subject,channel];
-    [self.webView evaluateJavaScript:jsStr completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        NSLog(@"pay:%@----%@",result, error);
-    }];
+    [self.webView stringByEvaluatingJavaScriptFromString:jsStr];
 }
 
 - (void)shakeAction {
@@ -167,49 +130,19 @@
     }
 }
 
-#pragma mark - KVO
-
-// 计算wkWebView进度条
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if (object == self.webView && [keyPath isEqualToString:@"estimatedProgress"]) {
-        CGFloat newprogress = [[change objectForKey:NSKeyValueChangeNewKey] doubleValue];
-        if (newprogress == 1) {
-            [self.progressView setProgress:1.0 animated:YES];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.7 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                self.progressView.hidden = YES;
-                [self.progressView setProgress:0 animated:NO];
-            });
-            
-        }else {
-            self.progressView.hidden = NO;
-            [self.progressView setProgress:newprogress animated:YES];
-        }
-    }
-}
-
-#pragma mark - WKNavigationDelegate
-
-//拦截请求
-- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    NSURL *URL = navigationAction.request.URL;
+#pragma mark - UIWebViewDelegate
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    NSURL *URL = request.URL;
     NSString *scheme = [URL scheme];
     if ([scheme isEqualToString:@"haleyaction"]) {
         [self handleCustomAction:URL];
-        decisionHandler(WKNavigationActionPolicyCancel);
-        return;
+        return NO;
     }
-    decisionHandler(WKNavigationActionPolicyAllow);
+    return YES;
 }
 
-#pragma mark - WKUIDelegate
-
-//js调起iOS弹窗的方法
-- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        completionHandler();//此处的block回调一定要实现（即便是空实现）
-    }]];
-    [self presentViewController:alert animated:YES completion:nil];
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    [webView stringByEvaluatingJavaScriptFromString:@"var arr = [3, 4, 'abc'];"];
 }
 
 - (void)didReceiveMemoryWarning {

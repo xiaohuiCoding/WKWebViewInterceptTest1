@@ -18,6 +18,7 @@
 		4B02CE132058F20E002A1297 /* LocalTestVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B02CE122058F20E002A1297 /* LocalTestVC.m */; };
 		4B02CE162058F222002A1297 /* RemoteTestVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B02CE152058F222002A1297 /* RemoteTestVC.m */; };
 		4B02CE182058F438002A1297 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 4B02CE172058F437002A1297 /* index.html */; };
+		4B02CE1B2058F901002A1297 /* UIWebViewLocalTestVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B02CE1A2058F901002A1297 /* UIWebViewLocalTestVC.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,8 @@
 		4B02CE142058F222002A1297 /* RemoteTestVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteTestVC.h; sourceTree = "<group>"; };
 		4B02CE152058F222002A1297 /* RemoteTestVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RemoteTestVC.m; sourceTree = "<group>"; };
 		4B02CE172058F437002A1297 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		4B02CE192058F901002A1297 /* UIWebViewLocalTestVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UIWebViewLocalTestVC.h; sourceTree = "<group>"; };
+		4B02CE1A2058F901002A1297 /* UIWebViewLocalTestVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UIWebViewLocalTestVC.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +116,8 @@
 				4B02CDE02058F07B002A1297 /* AppDelegate.m */,
 				4B02CDE22058F07B002A1297 /* ViewController.h */,
 				4B02CDE32058F07B002A1297 /* ViewController.m */,
+				4B02CE192058F901002A1297 /* UIWebViewLocalTestVC.h */,
+				4B02CE1A2058F901002A1297 /* UIWebViewLocalTestVC.m */,
 				4B02CE112058F20E002A1297 /* LocalTestVC.h */,
 				4B02CE122058F20E002A1297 /* LocalTestVC.m */,
 				4B02CE142058F222002A1297 /* RemoteTestVC.h */,
@@ -279,6 +284,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B02CE1B2058F901002A1297 /* UIWebViewLocalTestVC.m in Sources */,
 				4B02CE162058F222002A1297 /* RemoteTestVC.m in Sources */,
 				4B02CE132058F20E002A1297 /* LocalTestVC.m in Sources */,
 				4B02CDE42058F07B002A1297 /* ViewController.m in Sources */,

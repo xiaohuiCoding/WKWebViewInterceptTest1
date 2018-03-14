@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "UIWebViewLocalTestVC.h"
 #import "LocalTestVC.h"
 #import "RemoteTestVC.h"
 
@@ -20,7 +21,12 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    self.navigationItem.title = @"WKWebView拦截测试";
+    self.navigationItem.title = @"网页拦截测试";
+}
+
+- (IBAction)uiWebViewLocalTest:(id)sender {
+    UIWebViewLocalTestVC *vc = [[UIWebViewLocalTestVC alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (IBAction)localTest:(id)sender {
